@@ -16,6 +16,8 @@ for arg in vars(args):
 
 splits = os.listdir(args.fold_A)
 
+cv2.CV_LOAD_IMAGE_COLOR = 1
+
 for sp in splits:
     img_fold_A = os.path.join(args.fold_A, sp)
     img_fold_B = os.path.join(args.fold_B, sp)
