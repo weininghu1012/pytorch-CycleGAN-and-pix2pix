@@ -36,6 +36,7 @@ def multipleImageToBlackWhite(fold_original, fold_output):
             # process
             singleImageToBlackWhite(path_original, path_output)
     print('All images finished')
+    print('test')
 
 
 if __name__ == "__main__":
@@ -43,7 +44,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser('create image pairs')
     parser.add_argument('--process_type', dest = 'process_type', help = 'The type you want the output image to tranfer into', type = str, default = 'WB')
     parser.add_argument('--fold_original', dest = 'fold_original', help = 'input directory for original', type = str)
-    parser.add_argument('--fold_output', dest = 'fold_output', help = 'input directory for processed images', type = str)
+    parser.add_argument('--fold_output', dest = 'fold_output', help = 'output directory for processed images', type = str)
 
     args = parser.parse_args()
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
         print('[%s] = ' % arg,  getattr(args, arg))
 
     # start to process the images
-    if (args.process_type == 'BlackWhite'):
+    if (args.process_type == 'WB'):
         multipleImageToBlackWhite(args.fold_original, args.fold_output)
 
 
