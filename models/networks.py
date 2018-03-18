@@ -199,6 +199,22 @@ class GANLoss(nn.Module):
         return self.loss(input, target_tensor)
 
 
+
+# WassersteinGANLoss
+class WassersteinGANLoss(nn.Module):
+    # directly use the parent class
+    def __init__(self):
+        super(WassersteinGANLoss, self).__init__()
+
+    def __call__(self, fake, real = None, generator_loss = True):
+        if (generator_loss):
+            wloss = fake.mean()
+        else:
+            wloss = real.mea() - fake.mean()
+        return wloss
+
+
+
 # Defines the generator that consists of Resnet blocks between a few
 # downsampling/upsampling operations.
 # Code and idea originally from Justin Johnson's architecture.
@@ -461,3 +477,38 @@ class PixelDiscriminator(nn.Module):
             return nn.parallel.data_parallel(self.net, input, self.gpu_ids)
         else:
             return self.net(input)
+
+# Not very sure about this part
+class WassersteinGANCritic(nn.Module):
+    def __init__(self, in_channels, conv_output_dim, gpu_ids=[]):
+        super(WassersteinGANCritic, self).__init__()
+        self.gpu_ids = gpu_ids
+        self.conv_net = nn.Sequential(
+            nn.Conv2d(in_channels, 64, kernel_size=4, stride=2),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(64, 128, kernel_size=4, stride=2),
+            nn.BatchNorm2d(128),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(128, 256, kernel_size=4, stride=2),
+            nn.BatchNorm2d(256),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(256, 512, kernel_size=4, stride=2),
+            nn.BatchNorm2d(512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(512, 512, kernel_size=4, stride=2),
+            nn.BatchNorm2d(512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+        )
+        self.mlp_net = nn.Sequential(
+            nn.Linear(512 * conv_output_dim * conv_output_dim, 512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Linear(512, 512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Linear(512, 1),
+        )
+
+    def forward(self, input):
+        h = self.conv_net(input)
+        h = h.view(h.size(0), h.size(1) * h.size(2) * h.size(3))
+        return self.mlp_net(h)
