@@ -155,7 +155,8 @@ class CycleGANModel(BaseModel):
         # D_B
         fake_A = self.fake_A_pool.query(self.fake_A)
         self.loss_D_B = self.backward_D_wasserstein(self.netD_B, self.real_A, fake_A)
-        loss_D = self.loss_D_A + self.loss_D_B
+
+        loss_D = (self.loss_D_A + self.loss_D_B)*0.5
         loss_D.backward(retain_variables=True)
 
     def backward_G(self):
@@ -293,7 +294,7 @@ class CycleGANModel(BaseModel):
 
             # G_A and G_B
             self.optimizer_G.zero_grad()
-            self.backward_G()
+            self.backward_wgan_G()
             self.optimizer_G.step()
             
             

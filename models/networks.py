@@ -162,8 +162,11 @@ def print_network(net):
 # When LSGAN is used, it is basically same as MSELoss,
 # but it abstracts away the need to create the target label tensor
 # that has the same size as the input
+
+
+# cyclegan default is using normal gan
 class GANLoss(nn.Module):
-    def __init__(self, use_lsgan=True, target_real_label=1.0, target_fake_label=0.0,
+    def __init__(self, use_which_gan, use_lsgan=False, target_real_label=1.0, target_fake_label=0.0,
                  tensor=torch.FloatTensor):
         super(GANLoss, self).__init__()
         self.real_label = target_real_label
@@ -171,10 +174,15 @@ class GANLoss(nn.Module):
         self.real_label_var = None
         self.fake_label_var = None
         self.Tensor = tensor
-        if use_lsgan:
-            self.loss = nn.MSELoss()
-        else:
-            self.loss = nn.BCELoss()
+        if (use_which_gan == 'CycleGAN'):
+            if use_lsgan:
+                self.loss = nn.MSELoss()
+            else:
+                self.loss = nn.BCELoss()
+        elif (use_which_gan == 'CycleWGAN'):
+            # Todo
+            
+
 
     def get_target_tensor(self, input, target_is_real):
         target_tensor = None
@@ -201,6 +209,7 @@ class GANLoss(nn.Module):
 
 
 # WassersteinGANLoss
+# Todo List
 class WassersteinGANLoss(nn.Module):
     # directly use the parent class
     def __init__(self):
@@ -208,11 +217,10 @@ class WassersteinGANLoss(nn.Module):
 
     def __call__(self, fake, real = None, generator_loss = True):
         if (generator_loss):
-            wloss = fake.mean()
+            wloss = -fake.mean()
         else:
             wloss = real.mea() - fake.mean()
         return wloss
-
 
 
 # Defines the generator that consists of Resnet blocks between a few
