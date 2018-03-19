@@ -53,10 +53,7 @@ class CycleGANModel(BaseModel):
             self.fake_A_pool = ImagePool(opt.pool_size)
             self.fake_B_pool = ImagePool(opt.pool_size)
             # define loss functions
-            if (self.use_which_gan == 'CycleWGAN'):
-                self.criterionGAN = networks.WassersteinGANLoss()
-            elif (self.use_which_gan == 'CycleGAN'):
-                self.criterionGAN = networks.GANLoss(use_lsgan=not opt.no_lsgan, tensor=self.Tensor)
+            self.criterionGAN = networks.GANLoss(use_which_gan = self.use_which_gan, use_lsgan=not opt.no_lsgan, tensor=self.Tensor)
             # L1 norm
             self.criterionCycle = torch.nn.L1Loss()
             self.criterionIdt = torch.nn.L1Loss()
@@ -66,7 +63,7 @@ class CycleGANModel(BaseModel):
                     self.optimizer_G = torch.optim.RMSprop(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr = opt.wgan_lrG)
                     self.optimizer_D_A = torch.optim.RMSprop(self.netD_A.parameters(), lr=opt.wgan_lrD)
                     self.optimizer_D_B = torch.optim.RMSprop(self.netD_B.parameters(), lr=opt.wgan_lrD)
-            elif (self.use_which_gan == 'CycleGAN'):
+            elif (self.use_which_gan == 'CycleGAN' or self.use_which_gan == 'ICycleWGAN'):
                 self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()),
                                                 lr=opt.lr, betas=(opt.beta1, 0.999))
                 self.optimizer_D_A = torch.optim.Adam(self.netD_A.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
@@ -269,7 +266,7 @@ class CycleGANModel(BaseModel):
             self.backward_D_B()
             self.optimizer_D_B.step()
 
-            # G_A and G_B
+            # G_A and G_B   # PUT G_A and G_B before D_A and D_B ???
             self.optimizer_G.zero_grad()
             self.backward_G()
             self.optimizer_G.step()
