@@ -55,7 +55,7 @@ class CycleGANModel(BaseModel):
             # define loss functions
             if (self.use_which_gan == 'CycleWGAN'):
                 self.criterionGAN = networks.WassersteinGANLoss()
-            else:
+            elif (self.use_which_gan == 'CycleGAN'):
                 self.criterionGAN = networks.GANLoss(use_lsgan=not opt.no_lsgan, tensor=self.Tensor)
             # L1 norm
             self.criterionCycle = torch.nn.L1Loss()
@@ -64,9 +64,9 @@ class CycleGANModel(BaseModel):
             if (self.use_which_gan == 'CycleWGAN'):
                 if (self.wgan_optimizer == 'rmsprop'):
                     self.optimizer_G = torch.optim.RMSprop(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr = opt.wgan_lrG)
-                    self.optimizer_D_A = torch.optim.Adam(self.netD_A.parameters(), lr=opt.wgan_lrD)
-                    self.optimizer_D_B = torch.optim.Adam(self.netD_B.parameters(), lr=opt.wgan_lrD)
-            else:
+                    self.optimizer_D_A = torch.optim.RMSprop(self.netD_A.parameters(), lr=opt.wgan_lrD)
+                    self.optimizer_D_B = torch.optim.RMSprop(self.netD_B.parameters(), lr=opt.wgan_lrD)
+            elif (self.use_which_gan == 'CycleGAN'):
                 self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()),
                                                 lr=opt.lr, betas=(opt.beta1, 0.999))
                 self.optimizer_D_A = torch.optim.Adam(self.netD_A.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
@@ -103,15 +103,15 @@ class CycleGANModel(BaseModel):
         self.real_B = Variable(self.input_B)
 
     def test(self):
-        self.real_A = Variable(self.input_A, volatile=True)
-        self.fake_B = self.netG_A(self.real_A)
-        self.rec_A = self.netG_B(self.fake_B).data
-        #self.fake_B = self.fake_B.data
+        real_A = Variable(self.input_A, volatile=True)
+        fake_B = self.netG_A(real_A)
+        self.rec_A = self.netG_B(fake_B).data
+        self.fake_B = fake_B.data
 
-        self.real_B = Variable(self.input_B, volatile=True)
-        self.fake_A = self.netG_B(self.real_B)
-        self.rec_B = self.netG_A(self.fake_A).data
-        #self.fake_A = self.fake_A.data
+        real_B = Variable(self.input_B, volatile=True)
+        fake_A = self.netG_B(real_B)
+        self.rec_B = self.netG_A(fake_A).data
+        self.fake_A = fake_A.data
 
     # get image paths
     def get_image_paths(self):
