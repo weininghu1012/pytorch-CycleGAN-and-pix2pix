@@ -164,9 +164,17 @@ def print_network(net):
 # that has the same size as the input
 
 
+class WGANLoss(nn.Module):
+    # directly use the parent class
+    def __init__(self):
+        super(WGANLoss, self).__init__()
+
+    def __call__(self, input, target_tensor):
+        return input.mean() if int(target_tensor.data[0]) == 0 else -input.mean() 
+
 # cyclegan default is using normal gan
 class GANLoss(nn.Module):
-    def __init__(self, use_which_gan='CycleGAN', use_lsgan=False, target_real_label=1.0, target_fake_label=0.0,
+    def __init__(self, use_which_gan, use_lsgan=False, target_real_label=1.0, target_fake_label=0.0,
                  tensor=torch.FloatTensor):
         super(GANLoss, self).__init__()
         self.real_label = target_real_label
@@ -180,7 +188,7 @@ class GANLoss(nn.Module):
             else:
                 self.loss = nn.BCELoss()
         else: # ('CycleWGAN' or 'ICycleWGAN') 
-            self.loss = WGANLoss()  # (is it correct to directly call WGANLoss() ???)
+            self.loss = WGANLoss()  
 
     def get_target_tensor(self, input, target_is_real):
         target_tensor = None
@@ -204,14 +212,6 @@ class GANLoss(nn.Module):
         target_tensor = self.get_target_tensor(input, target_is_real)
         return self.loss(input, target_tensor)
 
-# change here by Meng (should be placed before GANLoss class ???)
-class WGANLoss(nn.Module):
-    # directly use the parent class
-    def __init__(self):
-        super(WGANLoss, self).__init__()
-
-    def __call__(self, input, target_tensor):
-        return int(target_tensor.data[0]) == 0 ? input.mean() : -input.mean() 
 
 # WassersteinGANLoss
 # Todo List
