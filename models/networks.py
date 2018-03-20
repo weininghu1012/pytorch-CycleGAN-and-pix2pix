@@ -170,7 +170,7 @@ class WGANLoss(nn.Module):
         super(WGANLoss, self).__init__()
 
     def __call__(self, input, target_tensor):
-        return input.mean() if int(target_tensor.data[0]) == 0 else -input.mean() 
+        return input.mean() if int(target_tensor.data[0][0][0][0]) == 0 else -input.mean() 
 
 # cyclegan default is using normal gan
 class GANLoss(nn.Module):
