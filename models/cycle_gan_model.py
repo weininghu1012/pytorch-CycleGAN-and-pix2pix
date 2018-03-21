@@ -257,6 +257,12 @@ class CycleGANModel(BaseModel):
         # forward
         self.forward()
         if (self.use_which_gan == 'CycleGAN'):
+            
+            # G_A and G_B   # PUT G_A and G_B before D_A and D_B ???
+            self.optimizer_G.zero_grad()
+            self.backward_G()
+            self.optimizer_G.step()
+
             # D_A
             self.optimizer_D_A.zero_grad()
             self.backward_D_A()
@@ -266,12 +272,15 @@ class CycleGANModel(BaseModel):
             self.backward_D_B()
             self.optimizer_D_B.step()
 
-            # G_A and G_B   # PUT G_A and G_B before D_A and D_B ???
+        # The changes here are that we need to add a bound for weights in the range [-c, c]
+        elif (self.use_which_gan == 'CycleWGAN'):
+
+
+            # G_A and G_B
             self.optimizer_G.zero_grad()
             self.backward_G()
             self.optimizer_G.step()
-        # The changes here are that we need to add a bound for weights in the range [-c, c]
-        elif (self.use_which_gan == 'CycleWGAN'):
+
             for t in range(self.wgan_n_critic):
                 # D_A
                 self.optimizer_D_A.zero_grad()
@@ -288,12 +297,6 @@ class CycleGANModel(BaseModel):
                 # clip
                 for p in self.netD_B.parameters():
                     p.data.clamp_(self.wgan_clip_lower, self.wgan_clip_upper)
-
-            # G_A and G_B
-            self.optimizer_G.zero_grad()
-            self.backward_G()
-            self.optimizer_G.step()
-            
             
 
 
