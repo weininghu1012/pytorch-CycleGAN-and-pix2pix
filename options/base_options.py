@@ -44,6 +44,15 @@ class BaseOptions():
         self.parser.add_argument('--identity', type=float, default=0.0, help='use identity mapping. Setting identity other than 1 has an effect of scaling the weight of the identity mapping loss. For example, if the weight of the identity loss should be 10 times smaller than the weight of the reconstruction loss, please set optidentity = 0.1')
         self.parser.add_argument('--use_dropout', action='store_true', help='use dropout for the generator')
 
+        # Add parameters for Wasserstein GAN
+        self.parser.add_argument('--use_which_gan', type = str, default = 'CycleGAN', help = 'String variable that indicates of using CycleGAN, CycleWGAN or ICycleWGAN')
+        self.parser.add_argument('--wgan_clip_upper', type = float, default = 0.01, help = 'The upper bound for weight clipping') # c in paper
+        self.parser.add_argument('--wgan_clip_lower', type = float, default = -0.01, help = 'The lower bound for weight clipping') # c in paper
+        self.parser.add_argument('--wgan_optimizer', type = str, default = 'rmsprop', help = 'Optimizer for generator and discriminator')
+        self.parser.add_argument('--wgan_lrG', type = float, default = 0.00005, help = 'Learning rate for generator, in paper it is alpha') # alpha in paper
+        self.parser.add_argument('--wgan_lrD', type = float, default = 0.00005, help = 'Learning rate for discriminator, in paper it is alpha') # alpha in paper
+        self.parser.add_argument('--wgan_n_critic', type = int, default = 5, help = 'The number of iterations of the critic per generator iteration') # n_critic in paper
+
         self.initialized = True
 
     def parse(self):
