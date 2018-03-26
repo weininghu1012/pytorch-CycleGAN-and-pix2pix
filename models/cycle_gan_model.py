@@ -258,7 +258,7 @@ class CycleGANModel(BaseModel):
         self.forward()
         if (self.use_which_gan == 'CycleGAN'):
             
-            # G_A and G_B   # PUT G_A and G_B before D_A and D_B ???
+            # G_A and G_B   
             self.optimizer_G.zero_grad()
             self.backward_G()
             self.optimizer_G.step()
