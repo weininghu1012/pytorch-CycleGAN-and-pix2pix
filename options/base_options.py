@@ -82,7 +82,10 @@ class BaseOptions():
         # save to the disk
         expr_dir = os.path.join(self.opt.checkpoints_dir, self.opt.name)
         util.mkdirs(expr_dir)
-        file_name = os.path.join(expr_dir, 'opt.txt')
+        if (self.opt.isTrain):
+            file_name = os.path.join(expr_dir, 'train_opt.txt')
+        else:
+            file_name = os.path.join(expr_dir, 'test_opt.txt')
         with open(file_name, 'wt') as opt_file:
             opt_file.write('------------ Options -------------\n')
             for k, v in sorted(args.items()):
