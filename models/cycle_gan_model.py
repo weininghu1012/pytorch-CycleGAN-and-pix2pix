@@ -63,7 +63,7 @@ class CycleGANModel(BaseModel):
                     self.optimizer_G = torch.optim.RMSprop(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr = opt.wgan_lrG)
                     self.optimizer_D_A = torch.optim.RMSprop(self.netD_A.parameters(), lr=opt.wgan_lrD)
                     self.optimizer_D_B = torch.optim.RMSprop(self.netD_B.parameters(), lr=opt.wgan_lrD)
-            elif (self.use_which_gan == 'CycleGAN' or self.use_which_gan == 'CycleWGAN-PG'):
+            elif (self.use_which_gan == 'CycleGAN' or self.use_which_gan == 'CycleWGAN-GP'):
                 self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()),
                                                 lr=opt.lr, betas=(opt.beta1, 0.999))
                 self.optimizer_D_A = torch.optim.Adam(self.netD_A.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
@@ -270,7 +270,7 @@ class CycleGANModel(BaseModel):
                 for p in self.netD_B.parameters():
                     p.data.clamp_(self.wgan_clip_lower, self.wgan_clip_upper)
             
-        elif (self.use_which_gan == 'CycleWGAN-PG'):
+        elif (self.use_which_gan == 'CycleWGAN-GP'):
 
             # G_A and G_B
             self.optimizer_G.zero_grad()
