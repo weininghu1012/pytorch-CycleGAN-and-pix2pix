@@ -155,10 +155,11 @@ class CycleGANModel(BaseModel):
         # add gradient penalty 
         loss_GP = self.gradient_penalty(netD, real, fake)
         loss_D += loss_GP
-        self.loss_GP = loss_GP.data[0]
 
         # backward
         loss_D.backward()
+
+        self.loss_GP = loss_GP.data[0]
         return loss_D
 
     def backward_D_A(self):
