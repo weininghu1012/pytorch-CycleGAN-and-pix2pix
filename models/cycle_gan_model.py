@@ -115,30 +115,31 @@ class CycleGANModel(BaseModel):
         return self.image_paths
 
     # add gradient_penalty
-    def gradient_penalty(netD, real_data, fake_data):
-            alpha = torch.rand(self.opt.batchSize, 1)
-            alpha = alpha.expand(real_data.size())
+    def gradient_penalty(self, netD, real_data, fake_data):
+        alpha = torch.rand(self.opt.batchSize, 1)
+        alpha = alpha.expand(real_data.size())
 
-            use_cuda = len(gpu_ids) > 0
-            gpu = gpu_ids[0]
+        use_cuda = len(self.gpu_ids) > 0
+        gpu = self.gpu_ids[0]
+        
+        alpha = alpha.contiguous()
+        alpha = alpha.cuda(gpu, async=True) if use_cuda else alpha
 
-            alpha = alpha.cuda(gpu) if use_cuda else alpha
+        interpolates = alpha * real_data.data + ((1 - alpha) * fake_data.data)
 
-            interpolates = alpha * real_data + ((1 - alpha) * fake_data)
+        if use_cuda:
+            interpolates = interpolates.cuda(gpu, async=True)
+        interpolates = torch.autograd.Variable(interpolates, requires_grad=True)
 
-            if use_cuda:
-                interpolates = interpolates.cuda(gpu)
-            interpolates = autograd.Variable(interpolates, requires_grad=True)
+        disc_interpolates = netD(interpolates)
 
-            disc_interpolates = netD(interpolates)
+        gradients = torch.autograd.grad(outputs=disc_interpolates, inputs=interpolates,
+                                  grad_outputs=torch.ones(disc_interpolates.size()).cuda(gpu, async=True) if use_cuda else torch.ones(
+                                      disc_interpolates.size()),
+                                  create_graph=True, retain_graph=True, only_inputs=True)[0]
 
-            gradients = autograd.grad(outputs=disc_interpolates, inputs=interpolates,
-                                      grad_outputs=torch.ones(disc_interpolates.size()).cuda(gpu) if use_cuda else torch.ones(
-                                          disc_interpolates.size()),
-                                      create_graph=True, retain_graph=True, only_inputs=True)[0]
-
-            gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * self.opt.lambda_GP
-            return gradient_penalty
+        gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * self.opt.lambda_GP
+        return gradient_penalty
 
 
     def backward_D_basic(self, netD, real, fake):
@@ -152,7 +153,7 @@ class CycleGANModel(BaseModel):
         loss_D = (loss_D_real + loss_D_fake) * 0.5
 
         # add gradient penalty 
-        loss_GP = gradient_penalty(netD, real, fake)
+        loss_GP = self.gradient_penalty(netD, real, fake)
         loss_D += loss_GP
 
         # backward
