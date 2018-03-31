@@ -216,21 +216,6 @@ class GANLoss(nn.Module):
         return self.loss(input, target_tensor)
 
 
-# WassersteinGANLoss
-# Todo List
-class WassersteinGANLoss(nn.Module):
-    # directly use the parent class
-    def __init__(self):
-        super(WassersteinGANLoss, self).__init__()
-
-    def __call__(self, fake, real = None, generator_loss = True):
-        if (generator_loss):
-            wloss = -fake.mean()
-        else:
-            wloss = real.mea() - fake.mean()
-        return wloss
-
-
 # Defines the generator that consists of Resnet blocks between a few
 # downsampling/upsampling operations.
 # Code and idea originally from Justin Johnson's architecture.
