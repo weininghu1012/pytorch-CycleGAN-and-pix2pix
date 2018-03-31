@@ -152,24 +152,31 @@ class CycleGANModel(BaseModel):
         # Combined loss
         loss_D = (loss_D_real + loss_D_fake) * 0.5
 
-        # add gradient penalty 
-        loss_GP = self.gradient_penalty(netD, real, fake)
-        loss_D += loss_GP
-
-        # backward
-        loss_D.backward()
-
-        self.loss_GP = loss_GP.data[0]
         return loss_D
 
     def backward_D_A(self):
         fake_B = self.fake_B_pool.query(self.fake_B)
         loss_D_A = self.backward_D_basic(self.netD_A, self.real_B, fake_B)
+        
+        # add gradient penalty 
+        loss_GP_A = self.gradient_penalty(self.netD_A, self.real_B, fake_B)
+        loss_D_A -= loss_GP_A
+
+        # backward
+        loss_D_A.backward()
+
+        self.loss_GP_A = loss_GP_A.data[0]
         self.loss_D_A = loss_D_A.data[0]
 
     def backward_D_B(self):
         fake_A = self.fake_A_pool.query(self.fake_A)
         loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, fake_A)
+
+        # add gradient penalty 
+        loss_GP_B = self.gradient_penalty(self.netD_B, self.real_A, fake_A)
+        loss_D_B -= loss_GP_B
+
+        self.loss_GP_B = loss_GP_B.data[0]
         self.loss_D_B = loss_D_B.data[0]
 
     def backward_G(self):
@@ -294,7 +301,8 @@ class CycleGANModel(BaseModel):
 
     def get_current_errors(self):
         ret_errors = OrderedDict([('D_A', self.loss_D_A), ('G_A', self.loss_G_A), ('Cyc_A', self.loss_cycle_A),
-                                  ('D_B', self.loss_D_B), ('G_B', self.loss_G_B), ('Cyc_B', self.loss_cycle_B), ('GP', self.loss_GP)])
+                                  ('D_B', self.loss_D_B), ('G_B', self.loss_G_B), ('Cyc_B', self.loss_cycle_B), 
+                                  ('GP_A', self.loss_GP_A), ('GP_B', self.loss_GP_B)])
         if self.opt.lambda_identity > 0.0:
             ret_errors['idt_A'] = self.loss_idt_A
             ret_errors['idt_B'] = self.loss_idt_B
