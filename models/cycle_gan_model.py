@@ -53,7 +53,7 @@ class CycleGANModel(BaseModel):
             self.fake_A_pool = ImagePool(opt.pool_size)
             self.fake_B_pool = ImagePool(opt.pool_size)
             # define loss functions
-            self.criterionGAN = networks.GANLoss(use_which_gan = self.use_which_gan, use_lsgan=not opt.no_lsgan, tensor=self.Tensor)
+            self.criterionGAN = networks.--no_lsgan(use_which_gan = self.use_which_gan, use_lsgan=not opt.no_lsgan, tensor=self.Tensor)
             # L1 norm
             self.criterionCycle = torch.nn.L1Loss()
             self.criterionIdt = torch.nn.L1Loss()
@@ -150,11 +150,11 @@ class CycleGANModel(BaseModel):
         pred_fake = netD(fake.detach())
         loss_D_fake = self.criterionGAN(pred_fake, False)
         # Combined loss
-        loss_D = (loss_D_real + loss_D_fake) * 0.5
+        loss_D = (loss_D_real + loss_D_fake) 
 
         # add gradient penalty 
         loss_GP = self.gradient_penalty(netD, real, fake)
-        loss_D += loss_GP
+        loss_D -= loss_GP
 
         # backward
         loss_D.backward()
