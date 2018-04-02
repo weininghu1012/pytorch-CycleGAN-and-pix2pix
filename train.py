@@ -37,8 +37,15 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
             errors = model.get_current_errors()
             t = (time.time() - iter_start_time) / opt.batchSize
             visualizer.print_current_errors(epoch, epoch_iter, errors, t, t_data)
+
+            # Add the implementation for add weight visialization
+            trained_weights_D_A_tensor = model.netD_A.weight.data.numpy()
             if opt.display_id > 0:
                 visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
+                visualizer.plot_current_weights(epoch, trained_weights_D_A_tensor)
+
+
+
 
         if total_steps % opt.save_latest_freq == 0:
             print('saving the latest model (epoch %d, total_steps %d)' %

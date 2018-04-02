@@ -113,6 +113,22 @@ class Visualizer():
                 'ylabel': 'loss'},
             win=self.display_id)
 
+    def plot_current_weights(self, epoch, weights_tensor):
+        num_kernels = weights_tensor.shape[0]
+        num_rows = 1 + num_kernels // num_cols
+
+        # starting the figure
+        fig = plt.figure(figsize = (num_cols, num_rows))
+        for i in range(weights_tensor.shape[0]):
+            ax1 = fig.add_subplot(num_rows, num_cols, i+1)
+            ax1.imshow(weights_tensor[i])
+            ax1.axis('off')
+            ax1.set_xticklabels([])
+            ax1.set_yticklabels([])
+        plot.subplots_adjust(wspace = 0.1, hsapce = 0.1)
+        self.vis._send({'data':plotly_fig.data,
+                       'layout':plotly_fig.layout})
+
     # errors: same format as |errors| of plotCurrentErrors
     def print_current_errors(self, epoch, i, errors, t, t_data):
         message = '(epoch: %d, iters: %d, time: %.3f, data: %.3f) ' % (epoch, i, t, t_data)
