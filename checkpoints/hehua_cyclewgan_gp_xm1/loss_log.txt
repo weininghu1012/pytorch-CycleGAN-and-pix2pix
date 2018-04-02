@@ -1,0 +1,18 @@
+================ Training Loss (Sat Mar 31 23:32:32 2018) ================
+(epoch: 2, iters: 30, time: 3.206, data: 0.058) D_A: -13981.217 G_A: -8.812 Cyc_A: 5.604 D_B: -85835.672 G_B: -187.573 Cyc_B: 6.996 GP: 85961.648 idt_A: 3.592 idt_B: 3.274 
+================ Training Loss (Sat Mar 31 23:40:08 2018) ================
+(epoch: 2, iters: 30, time: 2.842, data: 0.059) D_A: -53.872 G_A: -28.382 Cyc_A: 6.585 D_B: -45505.590 G_B: -89.626 Cyc_B: 4.503 GP: 45623.730 idt_A: 2.372 idt_B: 2.827 
+(epoch: 3, iters: 60, time: 2.907, data: 0.002) D_A: -603.315 G_A: -64.923 Cyc_A: 4.956 D_B: -1313.012 G_B: -228.329 Cyc_B: 4.151 GP: 1652.357 idt_A: 1.791 idt_B: 2.405 
+(epoch: 5, iters: 20, time: 2.785, data: 0.002) D_A: 233.082 G_A: -124.387 Cyc_A: 4.012 D_B: -3013.889 G_B: -285.459 Cyc_B: 6.305 GP: 3311.378 idt_A: 2.947 idt_B: 1.999 
+(epoch: 6, iters: 50, time: 2.802, data: 0.002) D_A: -179.697 G_A: -107.735 Cyc_A: 4.716 D_B: -17589.395 G_B: -302.270 Cyc_B: 7.035 GP: 17950.445 idt_A: 3.623 idt_B: 2.414 
+================ Training Loss (Sun Apr  1 00:02:04 2018) ================
+(epoch: 2, iters: 30, time: 2.818, data: 0.058) D_A: -651.197 G_A: -47.548 Cyc_A: 5.154 D_B: -6309.487 G_B: -49.834 Cyc_B: 5.713 GP: 6385.476 idt_A: 2.681 idt_B: 2.712 
+(epoch: 3, iters: 60, time: 2.796, data: 0.004) D_A: -2778.584 G_A: -128.227 Cyc_A: 6.771 D_B: 52.583 G_B: -94.412 Cyc_B: 6.127 GP: 28.848 idt_A: 3.017 idt_B: 3.430 
+(epoch: 5, iters: 20, time: 2.783, data: 0.002) D_A: -5476.563 G_A: -153.208 Cyc_A: 7.279 D_B: -104.096 G_B: -77.731 Cyc_B: 5.712 GP: 162.567 idt_A: 3.211 idt_B: 3.458 
+================ Training Loss (Sun Apr  1 00:18:47 2018) ================
+(epoch: 2, iters: 30, time: 2.845, data: 0.063) D_A: -259.486 G_A: 118.902 Cyc_A: 4.998 D_B: -197.222 G_B: 22.678 Cyc_B: 6.621 GP: 29.964 idt_A: 3.647 idt_B: 2.331 
+(epoch: 3, iters: 60, time: 2.776, data: 0.002) D_A: -218.960 G_A: 287.892 Cyc_A: 6.904 D_B: -229.625 G_B: -62.992 Cyc_B: 7.741 GP: 11.340 idt_A: 3.527 idt_B: 2.928 
+(epoch: 5, iters: 20, time: 2.765, data: 0.002) D_A: -349.764 G_A: 428.721 Cyc_A: 6.882 D_B: -482.773 G_B: 373.151 Cyc_B: 6.483 GP: 38.779 idt_A: 2.772 idt_B: 3.013 
+(epoch: 6, iters: 50, time: 2.831, data: 0.002) D_A: -320.801 G_A: 407.073 Cyc_A: 6.740 D_B: -557.636 G_B: 417.174 Cyc_B: 6.769 GP: 217.745 idt_A: 4.312 idt_B: 3.453 
+(epoch: 8, iters: 10, time: 2.849, data: 0.003) D_A: -696.289 G_A: 454.473 Cyc_A: 8.107 D_B: -755.486 G_B: 521.900 Cyc_B: 4.197 GP: 98.973 idt_A: 3.023 idt_B: 2.757 
+(epoch: 9, iters: 40, time: 2.851, data: 0.002) D_A: -716.262 G_A: 602.203 Cyc_A: 5.888 D_B: -740.948 G_B: -54.371 Cyc_B: 7.361 GP: 99.957 idt_A: 3.358 idt_B: 3.371 
