@@ -150,7 +150,7 @@ class CycleGANModel(BaseModel):
         pred_fake = netD(fake.detach())
         loss_D_fake = self.criterionGAN(pred_fake, False)
         # Combined loss
-        loss_D = (loss_D_real + loss_D_fake) * 0.5
+        loss_D = (loss_D_real + loss_D_fake)
 
         return loss_D
 
@@ -160,7 +160,7 @@ class CycleGANModel(BaseModel):
         
         # add gradient penalty 
         loss_GP_A = self.gradient_penalty(self.netD_A, self.real_B, fake_B)
-        loss_D_A -= loss_GP_A
+        loss_D_A += loss_GP_A
 
         # backward
         loss_D_A.backward()
@@ -174,7 +174,10 @@ class CycleGANModel(BaseModel):
 
         # add gradient penalty 
         loss_GP_B = self.gradient_penalty(self.netD_B, self.real_A, fake_A)
-        loss_D_B -= loss_GP_B
+        loss_D_B += loss_GP_B
+
+        # backward
+        loss_D_B.backward()
 
         self.loss_GP_B = loss_GP_B.data[0]
         self.loss_D_B = loss_D_B.data[0]
