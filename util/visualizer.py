@@ -29,6 +29,7 @@ class Visualizer():
         with open(self.log_name, "a") as log_file:
             now = time.strftime("%c")
             log_file.write('================ Training Loss (%s) ================\n' % now)
+        self.loss_csv_name = os.path.join(opt.checkpoints_dir, opt.name, 'loss_compare.csv')
 
     def reset(self):
         self.saved = False
@@ -122,6 +123,22 @@ class Visualizer():
         print(message)
         with open(self.log_name, "a") as log_file:
             log_file.write('%s\n' % message)
+
+    def save_current_errors_to_csv(self, epoch, errors):
+        #loss_csv = open(self.loss_csv_name, "w")
+        if (epoch == 2):
+            with open(self.loss_csv_name, "a") as loss_csv:
+            	columnTitle = "epoch,"
+            	for k, v in errors.items():
+                	columnTitle += '%s,' % (k)
+            	columnTitle = columnTitle + "\n"
+            	loss_csv.write(columnTitle)
+        # just simply insert in the value
+        row = '%d,' % (epoch)
+        for k, v in errors.items():
+            row += '%.3f,' % (v)
+        with open(self.loss_csv_name, "a") as loss_csv:
+            loss_csv.write('%s\n' % row)    
 
     # save image to the disk
     def save_images(self, webpage, visuals, image_path, aspect_ratio=1.0):
