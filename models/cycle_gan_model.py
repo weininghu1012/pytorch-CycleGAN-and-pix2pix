@@ -122,7 +122,7 @@ class CycleGANModel(BaseModel):
         use_cuda = len(self.gpu_ids) > 0
         gpu = self.gpu_ids[0]
         
-        alpha = alpha.contiguous()
+        alpha = alpha.contiguous() # https://discuss.pytorch.org/t/runtimeerror-input-is-not-contiguous/930
         alpha = alpha.cuda(gpu, async=True) if use_cuda else alpha
 
         interpolates = alpha * real_data.data + ((1 - alpha) * fake_data.data)
