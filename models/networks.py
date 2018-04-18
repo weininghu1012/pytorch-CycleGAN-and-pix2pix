@@ -162,8 +162,22 @@ def print_network(net):
 # When LSGAN is used, it is basically same as MSELoss,
 # but it abstracts away the need to create the target label tensor
 # that has the same size as the input
+
+
+class WGANLoss(nn.Module):
+    # directly use the parent class
+    def __init__(self):
+        super(WGANLoss, self).__init__()
+
+    def __call__(self, input, target_tensor):
+        if int(target_tensor.data[0][0][0][0]) == 0:  # target_is_real == False 
+            return torch.mean(input)
+        else:
+            return -torch.mean(input)
+
+# cyclegan default is using normal gan
 class GANLoss(nn.Module):
-    def __init__(self, use_lsgan=True, target_real_label=1.0, target_fake_label=0.0,
+    def __init__(self, use_which_gan, use_lsgan=False, target_real_label=1.0, target_fake_label=0.0,
                  tensor=torch.FloatTensor):
         super(GANLoss, self).__init__()
         self.real_label = target_real_label
@@ -171,10 +185,13 @@ class GANLoss(nn.Module):
         self.real_label_var = None
         self.fake_label_var = None
         self.Tensor = tensor
-        if use_lsgan:
-            self.loss = nn.MSELoss()
-        else:
-            self.loss = nn.BCELoss()
+        if (use_which_gan == 'CycleGAN'):
+            if use_lsgan:
+                self.loss = nn.MSELoss()
+            else:
+                self.loss = nn.BCELoss()
+        else: # ('CycleWGAN' or 'ICycleWGAN') 
+            self.loss = WGANLoss()  
 
     def get_target_tensor(self, input, target_is_real):
         target_tensor = None
@@ -197,6 +214,21 @@ class GANLoss(nn.Module):
     def __call__(self, input, target_is_real):
         target_tensor = self.get_target_tensor(input, target_is_real)
         return self.loss(input, target_tensor)
+
+
+# WassersteinGANLoss
+# Todo List
+class WassersteinGANLoss(nn.Module):
+    # directly use the parent class
+    def __init__(self):
+        super(WassersteinGANLoss, self).__init__()
+
+    def __call__(self, fake, real = None, generator_loss = True):
+        if (generator_loss):
+            wloss = -fake.mean()
+        else:
+            wloss = real.mea() - fake.mean()
+        return wloss
 
 
 # Defines the generator that consists of Resnet blocks between a few
@@ -461,3 +493,38 @@ class PixelDiscriminator(nn.Module):
             return nn.parallel.data_parallel(self.net, input, self.gpu_ids)
         else:
             return self.net(input)
+
+# Not very sure about this part
+class WassersteinGANCritic(nn.Module):
+    def __init__(self, in_channels, conv_output_dim, gpu_ids=[]):
+        super(WassersteinGANCritic, self).__init__()
+        self.gpu_ids = gpu_ids
+        self.conv_net = nn.Sequential(
+            nn.Conv2d(in_channels, 64, kernel_size=4, stride=2),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(64, 128, kernel_size=4, stride=2),
+            nn.BatchNorm2d(128),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(128, 256, kernel_size=4, stride=2),
+            nn.BatchNorm2d(256),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(256, 512, kernel_size=4, stride=2),
+            nn.BatchNorm2d(512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Conv2d(512, 512, kernel_size=4, stride=2),
+            nn.BatchNorm2d(512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+        )
+        self.mlp_net = nn.Sequential(
+            nn.Linear(512 * conv_output_dim * conv_output_dim, 512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Linear(512, 512),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.Linear(512, 1),
+        )
+
+    def forward(self, input):
+        h = self.conv_net(input)
+        h = h.view(h.size(0), h.size(1) * h.size(2) * h.size(3))
+        return self.mlp_net(h)

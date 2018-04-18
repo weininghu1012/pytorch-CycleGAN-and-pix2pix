@@ -40,6 +40,18 @@ class BaseOptions():
         self.parser.add_argument('--resize_or_crop', type=str, default='resize_and_crop', help='scaling and cropping of images at load time [resize_and_crop|crop|scale_width|scale_width_and_crop]')
         self.parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data augmentation')
         self.parser.add_argument('--init_type', type=str, default='normal', help='network initialization [normal|xavier|kaiming|orthogonal]')
+        
+        self.parser.add_argument('--identity', type=float, default=0.0, help='use identity mapping. Setting identity other than 1 has an effect of scaling the weight of the identity mapping loss. For example, if the weight of the identity loss should be 10 times smaller than the weight of the reconstruction loss, please set optidentity = 0.1')
+        self.parser.add_argument('--use_dropout', action='store_true', help='use dropout for the generator')
+
+        # Add parameters for Wasserstein GAN
+        self.parser.add_argument('--use_which_gan', type = str, default = 'CycleGAN', help = 'String variable that indicates of using CycleGAN, CycleWGAN or ICycleWGAN')
+        self.parser.add_argument('--wgan_clip_upper', type = float, default = 0.01, help = 'The upper bound for weight clipping') # c in paper
+        self.parser.add_argument('--wgan_clip_lower', type = float, default = -0.01, help = 'The lower bound for weight clipping') # c in paper
+        self.parser.add_argument('--wgan_optimizer', type = str, default = 'rmsprop', help = 'Optimizer for generator and discriminator')
+        self.parser.add_argument('--wgan_lrG', type = float, default = 0.00005, help = 'Learning rate for generator, in paper it is alpha') # alpha in paper
+        self.parser.add_argument('--wgan_lrD', type = float, default = 0.00005, help = 'Learning rate for discriminator, in paper it is alpha') # alpha in paper
+        self.parser.add_argument('--wgan_n_critic', type = int, default = 5, help = 'The number of iterations of the critic per generator iteration') # n_critic in paper
 
         self.initialized = True
 
@@ -70,7 +82,10 @@ class BaseOptions():
         # save to the disk
         expr_dir = os.path.join(self.opt.checkpoints_dir, self.opt.name)
         util.mkdirs(expr_dir)
-        file_name = os.path.join(expr_dir, 'opt.txt')
+        if (self.opt.isTrain):
+            file_name = os.path.join(expr_dir, 'train_opt.txt')
+        else:
+            file_name = os.path.join(expr_dir, 'test_opt.txt')
         with open(file_name, 'wt') as opt_file:
             opt_file.write('------------ Options -------------\n')
             for k, v in sorted(args.items()):
